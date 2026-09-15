@@ -1,36 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Lost Lands - Object Archive</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
+    /* ── THEME VARIABLES ── */
+    [data-theme="light"] {
+      --bg:           #FFFDE0;
+      --surface:      #FFFDE0;
+      --surface-form: #ffffff;
+      --border:       #D4C170;
+      --border-input: #999;
+      --band-bg:      #F5D800;
+      --band-border:  #C8A800;
+      --band-text:    #333;
+      --text:         #000000;
+      --text-secondary: #555;
+      --text-tertiary:  #888;
+      --link:         #00008B;
+      --link-hover:   #CC0000;
+      --link-visited: #551A8B;
+      --navy:         #000080;
+      --navy-text:    #ffffff;
+      --red:          #CC0000;
+      --red-dark:     #AA0000;
+      --listing-hover: #FFFFF0;
+      --no-thumb-bg:  #E8E8D8;
+      --filter-bg:    #E8E8D8;
+      --filter-hover: #D0D0C0;
+      --cancel-bg:    #E0E0D0;
+      --upload-bg:    #F5F5E8;
+      --upload-hover: #EEEEDD;
+      --icon-color:   #888;
+      --modal-border: #000080;
+      --config-bg:    #FFFF99;
+      --config-border:#CC0000;
+    }
+
+    [data-theme="dark"] {
+      --bg:           #1a1a14;
+      --surface:      #1a1a14;
+      --surface-form: #242418;
+      --border:       #3a3a28;
+      --border-input: #4a4a38;
+      --band-bg:      #2a2800;
+      --band-border:  #4a4400;
+      --band-text:    #C8A800;
+      --text:         #E8E4C0;
+      --text-secondary: #A0A080;
+      --text-tertiary:  #686850;
+      --link:         #7799FF;
+      --link-hover:   #FF6666;
+      --link-visited: #AA88FF;
+      --navy:         #1a1a60;
+      --navy-text:    #C0C8FF;
+      --red:          #CC0000;
+      --red-dark:     #AA0000;
+      --listing-hover: #222218;
+      --no-thumb-bg:  #2a2a20;
+      --filter-bg:    #252520;
+      --filter-hover: #303028;
+      --cancel-bg:    #2a2a20;
+      --upload-bg:    #222218;
+      --upload-hover: #2a2a20;
+      --icon-color:   #686850;
+      --modal-border: #4a4a80;
+      --config-bg:    #2a2600;
+      --config-border:#886600;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: Arial, Helvetica, sans-serif;
       font-size: 13px;
-      background: #FFFDE0;
-      color: #000000;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.2s, color 0.2s;
     }
 
-    a { color: #00008B; text-decoration: underline; cursor: pointer; }
-    a:visited { color: #551A8B; }
-    a:hover { color: #CC0000; }
+    a { color: var(--link); text-decoration: underline; cursor: pointer; }
+    a:visited { color: var(--link-visited); }
+    a:hover { color: var(--link-hover); }
 
     /* ── MASTHEAD ── */
     .masthead {
-      background: #FFFDE0;
-      border-bottom: 3px double #D4C170;
+      background: var(--bg);
+      border-bottom: 3px double var(--border);
       padding: 10px 14px 8px;
+      transition: background 0.2s, border-color 0.2s;
     }
 
     .masthead-inner {
       max-width: 900px;
       margin: 0 auto;
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 14px;
       flex-wrap: wrap;
     }
@@ -39,42 +106,63 @@
       font-family: 'Times New Roman', Times, serif;
       font-size: 28px;
       font-weight: bold;
-      color: #000080;
+      color: var(--navy);
       letter-spacing: -0.5px;
+      transition: color 0.2s;
     }
+
+    [data-theme="dark"] .masthead h1 { color: var(--link); }
 
     .masthead-tagline {
       font-size: 11px;
-      color: #555;
+      color: var(--text-secondary);
       font-style: italic;
     }
 
-    .masthead-counter {
+    .masthead-right {
       margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .masthead-counter {
       font-size: 11px;
-      color: #555;
+      color: var(--text-secondary);
       white-space: nowrap;
     }
 
+    /* ── DARK MODE TOGGLE ── */
+    .dark-toggle {
+      font-family: Arial, sans-serif;
+      font-size: 11px;
+      padding: 2px 8px;
+      border: 1px solid var(--border-input);
+      background: var(--filter-bg);
+      color: var(--text);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+
+    .dark-toggle:hover { background: var(--filter-hover); }
+
     /* ── YELLOW BAND ── */
     .yellow-band {
-      background: #F5D800;
-      border-top: 1px solid #C8A800;
-      border-bottom: 2px solid #C8A800;
+      background: var(--band-bg);
+      border-top: 1px solid var(--band-border);
+      border-bottom: 2px solid var(--band-border);
       padding: 5px 14px;
       font-size: 11px;
-      color: #333;
+      color: var(--band-text);
       text-align: center;
       font-weight: bold;
       letter-spacing: 0.02em;
+      transition: background 0.2s, color 0.2s;
     }
 
     /* ── LAYOUT ── */
-    .page {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 14px;
-    }
+    .page { max-width: 900px; margin: 0 auto; padding: 0 14px; }
 
     /* ── CONTROLS ── */
     .controls {
@@ -82,36 +170,38 @@
       align-items: center;
       gap: 4px;
       padding: 8px 0;
-      border-bottom: 1px solid #D4C170;
+      border-bottom: 1px solid var(--border);
       margin-bottom: 10px;
       flex-wrap: wrap;
     }
 
-    .controls-label {
-      font-size: 11px;
-      font-weight: bold;
-      color: #333;
-      margin-right: 4px;
-    }
+    .controls-label { font-size: 11px; font-weight: bold; color: var(--text-secondary); margin-right: 4px; }
 
     .filter-btn {
       font-family: Arial, Helvetica, sans-serif;
       font-size: 11px;
       padding: 2px 8px;
-      border: 1px solid #999;
-      background: #E8E8D8;
-      color: #000080;
+      border: 1px solid var(--border-input);
+      background: var(--filter-bg);
+      color: var(--link);
       cursor: pointer;
       text-decoration: underline;
+      transition: background 0.15s, color 0.15s;
     }
 
-    .filter-btn:hover { background: #D0D0C0; color: #CC0000; }
+    .filter-btn:hover { background: var(--filter-hover); color: var(--link-hover); }
 
     .filter-btn.active {
-      background: #000080;
-      color: #FFFDE0;
+      background: var(--navy);
+      color: var(--navy-text);
       text-decoration: none;
-      border-color: #000050;
+      border-color: var(--navy);
+    }
+
+    [data-theme="dark"] .filter-btn.active {
+      background: var(--link);
+      color: #111;
+      border-color: var(--link);
     }
 
     .add-btn {
@@ -120,13 +210,14 @@
       font-size: 12px;
       font-weight: bold;
       padding: 3px 12px;
-      background: #CC0000;
+      background: var(--red);
       color: #ffffff;
       border: 2px outset #FF4444;
       cursor: pointer;
+      transition: background 0.15s;
     }
 
-    .add-btn:hover { background: #AA0000; border-style: inset; }
+    .add-btn:hover { background: var(--red-dark); border-style: inset; }
 
     /* ── LISTINGS ── */
     .listings { margin-bottom: 2rem; }
@@ -135,18 +226,19 @@
       display: flex;
       gap: 10px;
       padding: 7px 0;
-      border-bottom: 1px solid #D4C170;
+      border-bottom: 1px solid var(--border);
       cursor: pointer;
       align-items: flex-start;
+      transition: background 0.1s;
     }
 
-    .listing:hover { background: #FFFFF0; }
+    .listing:hover { background: var(--listing-hover); }
 
     .listing-thumb {
       width: 64px;
       height: 48px;
       flex-shrink: 0;
-      border: 1px solid #999;
+      border: 1px solid var(--border-input);
       object-fit: cover;
       display: block;
     }
@@ -155,69 +247,60 @@
       width: 64px;
       height: 48px;
       flex-shrink: 0;
-      border: 1px solid #ccc;
-      background: #E8E8D8;
+      border: 1px solid var(--border);
+      background: var(--no-thumb-bg);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
-      color: #999;
+      transition: background 0.2s;
     }
+
+    .listing-no-thumb svg { width: 22px; height: 22px; stroke: var(--icon-color); fill: none; stroke-width: 1.5; }
 
     .listing-body { flex: 1; min-width: 0; }
 
     .listing-title {
       font-size: 13px;
       font-weight: bold;
-      color: #00008B;
+      color: var(--link);
       text-decoration: underline;
     }
 
-    .listing:hover .listing-title { color: #CC0000; }
+    .listing:hover .listing-title { color: var(--link-hover); }
 
-    .listing-meta {
-      font-size: 11px;
-      color: #555;
-      margin: 1px 0 2px;
-    }
+    .listing-meta { font-size: 11px; color: var(--text-secondary); margin: 1px 0 2px; }
 
     .listing-excerpt {
       font-size: 12px;
-      color: #222;
+      color: var(--text);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      opacity: 0.75;
     }
 
     .listing-kind-tag {
       display: inline-block;
       font-size: 10px;
-      background: #000080;
-      color: #fff;
+      background: var(--navy);
+      color: var(--navy-text);
       padding: 0px 5px;
       margin-right: 5px;
       vertical-align: middle;
+      transition: background 0.2s, color 0.2s;
     }
+
+    [data-theme="dark"] .listing-kind-tag { background: #2a2a60; color: var(--link); }
 
     /* ── EMPTY ── */
-    .empty {
-      padding: 2rem 0;
-      color: #555;
-      font-size: 12px;
-    }
-
-    .empty-title {
-      font-family: 'Times New Roman', Times, serif;
-      font-size: 18px;
-      color: #000080;
-      margin-bottom: 6px;
-    }
+    .empty { padding: 2rem 0; color: var(--text-secondary); font-size: 12px; }
+    .empty-title { font-family: 'Times New Roman', Times, serif; font-size: 18px; color: var(--link); margin-bottom: 6px; }
 
     /* ── OVERLAY ── */
     .overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.65);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -227,18 +310,19 @@
 
     /* ── MODAL ── */
     .modal {
-      background: #FFFDE0;
-      border: 2px solid #000080;
+      background: var(--surface);
+      border: 2px solid var(--modal-border);
       width: 100%;
       max-width: 560px;
       max-height: 88vh;
       overflow-y: auto;
       position: relative;
+      transition: background 0.2s, border-color 0.2s;
     }
 
     .modal-titlebar {
-      background: #000080;
-      color: #ffffff;
+      background: var(--navy);
+      color: var(--navy-text);
       font-size: 12px;
       font-weight: bold;
       padding: 4px 8px;
@@ -246,10 +330,13 @@
       align-items: center;
       justify-content: space-between;
       font-family: 'Times New Roman', Times, serif;
+      transition: background 0.2s, color 0.2s;
     }
 
+    [data-theme="dark"] .modal-titlebar { background: #1a1a50; color: var(--link); }
+
     .modal-close-btn {
-      background: #CC0000;
+      background: var(--red);
       border: 1px outset #FF6666;
       color: white;
       font-size: 11px;
@@ -259,23 +346,23 @@
       font-family: Arial, sans-serif;
     }
 
-    .modal-close-btn:hover { background: #AA0000; border-style: inset; }
+    .modal-close-btn:hover { background: var(--red-dark); border-style: inset; }
 
     .modal-body { padding: 12px 14px 16px; }
 
     .modal h2 {
       font-family: 'Times New Roman', Times, serif;
       font-size: 20px;
-      color: #000080;
+      color: var(--link);
       margin-bottom: 4px;
       line-height: 1.25;
     }
 
     .modal-meta {
       font-size: 11px;
-      color: #555;
+      color: var(--text-secondary);
       margin-bottom: 10px;
-      border-bottom: 1px solid #D4C170;
+      border-bottom: 1px solid var(--border);
       padding-bottom: 8px;
     }
 
@@ -283,32 +370,17 @@
       width: 100%;
       max-height: 220px;
       object-fit: cover;
-      border: 1px solid #999;
+      border: 1px solid var(--border-input);
       margin-bottom: 10px;
       display: block;
     }
 
-    .modal-story {
-      font-size: 13px;
-      line-height: 1.7;
-      color: #222;
-      white-space: pre-wrap;
-    }
+    .modal-story { font-size: 13px; line-height: 1.7; color: var(--text); white-space: pre-wrap; opacity: 0.9; }
 
     /* ── FORM ── */
-    .form-title {
-      /* intentionally left to modal-titlebar */
-    }
-
     .form-group { margin-bottom: 10px; }
 
-    .form-label {
-      display: block;
-      font-size: 12px;
-      font-weight: bold;
-      color: #222;
-      margin-bottom: 3px;
-    }
+    .form-label { display: block; font-size: 12px; font-weight: bold; color: var(--text); margin-bottom: 3px; }
 
     .form-input,
     .form-select,
@@ -316,36 +388,38 @@
       width: 100%;
       font-family: Arial, Helvetica, sans-serif;
       font-size: 13px;
-      border: 1px inset #999;
+      border: 1px inset var(--border-input);
       padding: 4px 6px;
-      background: #ffffff;
-      color: #000;
+      background: var(--surface-form);
+      color: var(--text);
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
     }
 
     .form-textarea { min-height: 100px; resize: vertical; line-height: 1.55; }
 
     .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
-    .word-count { font-size: 11px; color: #555; text-align: right; margin-top: 3px; }
-    .word-count.over { color: #CC0000; font-weight: bold; }
+    .word-count { font-size: 11px; color: var(--text-secondary); text-align: right; margin-top: 3px; }
+    .word-count.over { color: var(--red); font-weight: bold; }
 
     .upload-area {
-      border: 1px dashed #999;
-      background: #F5F5E8;
+      border: 1px dashed var(--border-input);
+      background: var(--upload-bg);
       padding: 12px;
       text-align: center;
       cursor: pointer;
       font-size: 12px;
-      color: #555;
+      color: var(--text-secondary);
+      transition: background 0.15s;
     }
 
-    .upload-area:hover { background: #EEEEDD; }
+    .upload-area:hover { background: var(--upload-hover); }
 
     .upload-preview {
       width: 100%;
       max-height: 130px;
       object-fit: cover;
-      border: 1px solid #999;
+      border: 1px solid var(--border-input);
       margin-top: 8px;
       display: none;
     }
@@ -355,7 +429,7 @@
       gap: 8px;
       justify-content: flex-end;
       margin-top: 14px;
-      border-top: 1px solid #D4C170;
+      border-top: 1px solid var(--border);
       padding-top: 10px;
     }
 
@@ -363,8 +437,9 @@
       font-family: Arial, sans-serif;
       font-size: 12px;
       padding: 3px 14px;
-      border: 2px outset #ccc;
-      background: #E0E0D0;
+      border: 2px outset var(--border-input);
+      background: var(--cancel-bg);
+      color: var(--text);
       cursor: pointer;
     }
 
@@ -376,60 +451,44 @@
       font-weight: bold;
       padding: 3px 16px;
       border: 2px outset #FF6666;
-      background: #CC0000;
+      background: var(--red);
       color: #fff;
       cursor: pointer;
     }
 
-    .btn-submit:hover { border-style: inset; background: #AA0000; }
+    .btn-submit:hover { border-style: inset; background: var(--red-dark); }
     .btn-submit:disabled { opacity: 0.45; cursor: default; }
 
-    .form-error {
-      font-size: 11px;
-      color: #CC0000;
-      font-weight: bold;
-      margin-top: 8px;
-      display: none;
-    }
+    .form-error { font-size: 11px; color: var(--red); font-weight: bold; margin-top: 8px; display: none; }
 
     /* ── CONFIG BANNER ── */
     .config-banner {
-      background: #FFFF99;
-      border: 1px solid #CC0000;
+      background: var(--config-bg);
+      border: 1px solid var(--config-border);
       padding: 8px 12px;
       font-size: 12px;
-      color: #333;
+      color: var(--text);
       margin: 10px 0;
       line-height: 1.6;
     }
 
-    .config-banner code {
-      background: #fff;
-      border: 1px solid #ccc;
-      padding: 0 3px;
-      font-size: 11px;
-    }
+    .config-banner code { background: var(--surface-form); border: 1px solid var(--border); padding: 0 3px; font-size: 11px; }
 
     /* ── FOOTER ── */
     footer {
-      border-top: 3px double #D4C170;
+      border-top: 3px double var(--border);
       padding: 10px 14px;
       font-size: 11px;
-      color: #777;
+      color: var(--text-tertiary);
       text-align: center;
-      background: #FFFDE0;
+      background: var(--bg);
+      transition: background 0.2s, border-color 0.2s;
     }
-
-    footer a { color: #00008B; }
-
-    /* ── HR DIVIDER ── */
-    hr.section { border: none; border-top: 1px solid #D4C170; margin: 6px 0; }
 
     /* ── SPINNER ── */
     .spinner {
       display: inline-block;
-      width: 10px;
-      height: 10px;
+      width: 10px; height: 10px;
       border: 2px solid rgba(255,255,255,0.4);
       border-top-color: white;
       border-radius: 50%;
@@ -449,11 +508,40 @@
 </script>
 <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
 
+<!-- SVG icon defs (hidden) -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="icon-clothing" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/>
+  </symbol>
+  <symbol id="icon-electronic" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+  </symbol>
+  <symbol id="icon-toy" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2a5 5 0 015 5v1h1a3 3 0 010 6h-1v1a5 5 0 01-10 0v-1H6a3 3 0 010-6h1V7a5 5 0 015-5z"/>
+    <circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/>
+    <circle cx="15" cy="10" r="1" fill="currentColor" stroke="none"/>
+    <path d="M9 14s1 1.5 3 1.5 3-1.5 3-1.5"/>
+  </symbol>
+  <symbol id="icon-book" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+  </symbol>
+  <symbol id="icon-jewellery" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 3h12l4 6-10 13L2 9z"/><path d="M2 9h20M12 3l4 6-4 13-4-13 4-6"/>
+  </symbol>
+  <symbol id="icon-other" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+  </symbol>
+</svg>
+
 <div class="masthead">
   <div class="masthead-inner">
     <h1>The Lost Lands</h1>
     <span class="masthead-tagline">a free community archive of lost objects</span>
-    <span class="masthead-counter" id="hero-counter">loading...</span>
+    <div class="masthead-right">
+      <span class="masthead-counter" id="hero-counter">loading...</span>
+      <button class="dark-toggle" onclick="toggleDark()" id="dark-toggle-btn">[ night mode ]</button>
+    </div>
   </div>
 </div>
 
@@ -462,7 +550,6 @@
 </div>
 
 <div class="page">
-
   <div id="config-warning"></div>
 
   <div class="controls">
@@ -480,7 +567,6 @@
   <div class="listings" id="listings">
     <div class="empty"><p class="empty-title">Loading archive...</p></div>
   </div>
-
 </div>
 
 <!-- View modal -->
@@ -507,12 +593,10 @@
       <button class="modal-close-btn" onclick="closeAddModal()">X</button>
     </div>
     <div class="modal-body">
-
       <div class="form-group">
         <label class="form-label" for="f-title">Name of object:</label>
         <input class="form-input" id="f-title" type="text" placeholder="e.g. My grandmother's blue coat">
       </div>
-
       <div class="form-group">
         <label class="form-label" for="f-kind">Category:</label>
         <select class="form-select" id="f-kind">
@@ -525,7 +609,6 @@
           <option value="other">Other</option>
         </select>
       </div>
-
       <div class="form-group">
         <label class="form-label">Date lost (approximate):</label>
         <div class="date-row">
@@ -539,38 +622,33 @@
           <input class="form-input" id="f-year" type="number" placeholder="Year" min="1900" max="2099">
         </div>
       </div>
-
       <div class="form-group">
-        <label class="form-label" for="f-story">Tell its story: <span style="font-weight:normal;color:#555">(200 words max)</span></label>
+        <label class="form-label" for="f-story">Tell its story: <span style="font-weight:normal;opacity:0.7">(200 words max)</span></label>
         <textarea class="form-textarea" id="f-story"
           placeholder="Where did it come from? How was it lost? What do you remember?"
           oninput="updateWordCount()"></textarea>
         <p class="word-count" id="word-count">0 / 200 words</p>
       </div>
-
       <div class="form-group">
-        <label class="form-label">Photo: <span style="font-weight:normal;color:#555">(optional, jpg/png)</span></label>
+        <label class="form-label">Photo: <span style="font-weight:normal;opacity:0.7">(optional, jpg/png)</span></label>
         <div class="upload-area" onclick="document.getElementById('f-photo').click()">
           [ click to attach a photo ]
           <input type="file" id="f-photo" accept="image/*" style="display:none" onchange="previewPhoto(event)">
         </div>
         <img id="f-preview" class="upload-preview" alt="Preview">
       </div>
-
       <p class="form-error" id="form-error"></p>
-
       <div class="form-actions">
         <button class="btn-cancel" onclick="closeAddModal()">Cancel</button>
         <button class="btn-submit" id="submit-btn" onclick="submitObject()">Submit to Archive</button>
       </div>
-
     </div>
   </div>
 </div>
 
 <footer>
   <strong>The Lost Lands</strong> — a free community archive of lost objects &nbsp;|&nbsp;
-  no sign-up &nbsp;|&nbsp; no ads &nbsp;|&nbsp; a memorial so the inanimate may live on
+  no sign-up &nbsp;|&nbsp; no ads &nbsp;|&nbsp; just things that were once somewhere
 </footer>
 
 <script>
@@ -578,13 +656,29 @@
   let db;
   let configOk = false;
 
+  // ── Dark mode ──
+  function toggleDark() {
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    document.getElementById('dark-toggle-btn').textContent = isDark ? '[ night mode ]' : '[ day mode ]';
+    localStorage.setItem('ll-theme', isDark ? 'light' : 'dark');
+  }
+
+  // Restore saved theme
+  const savedTheme = localStorage.getItem('ll-theme');
+  if (savedTheme) {
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    if (savedTheme === 'dark') document.getElementById('dark-toggle-btn').textContent = '[ day mode ]';
+  }
+
   try {
     if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
       document.getElementById('config-warning').innerHTML = `
         <div class="config-banner">
           <strong>Setup needed:</strong> Open this file and replace
           <code>YOUR_SUPABASE_URL</code> and <code>YOUR_SUPABASE_ANON_KEY</code>
-          with your Supabase project credentials. See instructions at the bottom of this file.
+          with your Supabase project credentials.
         </div>`;
       document.getElementById('listings').innerHTML =
         '<div class="empty"><p class="empty-title">Awaiting setup.</p></div>';
@@ -595,7 +689,15 @@
     }
   } catch(e) { console.error(e); }
 
-  const KIND_EMOJI = { clothing:'🧥', electronic:'💻', toy:'🧸', book:'📖', jewellery:'💍', other:'📦' };
+  const KIND_ICON = {
+    clothing:   'icon-clothing',
+    electronic: 'icon-electronic',
+    toy:        'icon-toy',
+    book:       'icon-book',
+    jewellery:  'icon-jewellery',
+    other:      'icon-other'
+  };
+
   let allObjects = [];
   let currentFilter = 'all';
   let selectedFile = null;
@@ -619,6 +721,11 @@
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  function svgIcon(kind) {
+    const id = KIND_ICON[kind] || 'icon-other';
+    return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><use href="#${id}"/></svg>`;
+  }
+
   function render() {
     const filtered = currentFilter === 'all' ? allObjects : allObjects.filter(o => o.kind === currentFilter);
     const count = allObjects.length;
@@ -636,10 +743,9 @@
     }
 
     listings.innerHTML = filtered.map(obj => {
-      const emoji = KIND_EMOJI[obj.kind] || '📦';
       const thumbHTML = obj.photo_url
         ? `<img class="listing-thumb" src="${obj.photo_url}" alt="" loading="lazy">`
-        : `<div class="listing-no-thumb">${emoji}</div>`;
+        : `<div class="listing-no-thumb">${svgIcon(obj.kind)}</div>`;
       const dateStr = formatLostDate(obj.lost_month, obj.lost_year);
       const metaParts = [`<span class="listing-kind-tag">${obj.kind}</span>`];
       if (dateStr) metaParts.push(dateStr);
@@ -735,13 +841,11 @@
 
     if (!title || !kind || !story) {
       errEl.textContent = 'Error: please fill in the name, category, and story.';
-      errEl.style.display = 'block';
-      return;
+      errEl.style.display = 'block'; return;
     }
     if (countWords(story) > 200) {
       errEl.textContent = 'Error: story must be 200 words or fewer.';
-      errEl.style.display = 'block';
-      return;
+      errEl.style.display = 'block'; return;
     }
 
     const btn = document.getElementById('submit-btn');
@@ -757,9 +861,7 @@
       if (uploadError) {
         errEl.textContent = 'Photo upload failed: ' + uploadError.message;
         errEl.style.display = 'block';
-        btn.disabled = false;
-        btn.textContent = 'Submit to Archive';
-        return;
+        btn.disabled = false; btn.textContent = 'Submit to Archive'; return;
       }
       const { data: urlData } = db.storage.from('photos').getPublicUrl(uploadData.path);
       photo_url = urlData.publicUrl;
@@ -775,9 +877,7 @@
     if (error) {
       errEl.textContent = 'Something went wrong: ' + error.message;
       errEl.style.display = 'block';
-      btn.disabled = false;
-      btn.textContent = 'Submit to Archive';
-      return;
+      btn.disabled = false; btn.textContent = 'Submit to Archive'; return;
     }
 
     allObjects.unshift(data);
@@ -829,16 +929,14 @@ STEP 3 — Create the photo storage bucket
   → In the sidebar, click "Storage"
   → Click "New bucket", name it exactly:  photos
   → Check "Public bucket", click Save
-  → Go to Policies → Add policy on storage.objects → custom:
-
-      create policy "Anyone can upload photos"
-        on storage.objects for insert
-        with check (bucket_id = 'photos');
+  → Go to Policies → Add policy on storage.objects:
+      With check expression:  bucket_id = 'photos'
+      Operation: INSERT
 
 STEP 4 — Get your credentials
   → Settings → API in Supabase
-  → Copy "Project URL"     → paste as SUPABASE_URL above
-  → Copy "anon public" key → paste as SUPABASE_ANON_KEY above
+  → Copy "Project URL"        → paste as SUPABASE_URL above
+  → Copy "anon/publishable" key → paste as SUPABASE_ANON_KEY above
 
 STEP 5 — Deploy to Vercel
   → Rename this file to index.html
